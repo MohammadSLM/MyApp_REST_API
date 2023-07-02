@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.UserRepositories
 {
-    public class UserRepository : Repository<User>
+    public class UserRepository : Repository<User>, IUserRepository
     {
-        public UserRepository(ApplicationDbContext dbContext) 
+        public UserRepository(ApplicationDbContext dbContext)
             : base(dbContext)
         {
 

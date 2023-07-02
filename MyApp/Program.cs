@@ -1,4 +1,6 @@
 using DataAccess;
+using DataAccess.Repositories;
+using DataAccess.Repositories.UserRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -14,6 +16,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserRepository , UserRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
