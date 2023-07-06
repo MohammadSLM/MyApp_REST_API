@@ -12,7 +12,7 @@ namespace Domain.User
     {
         public string RoleName { get; set; }
         public string Description { get; set; }
-        public ICollection<User> Users { get; set; }
+        //public ICollection<User> Users { get; set; }
     }
 
     public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>

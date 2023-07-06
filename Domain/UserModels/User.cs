@@ -28,7 +28,7 @@ namespace Domain.User
         public string? Email { get; set; }
         public bool IsActive { get; set; }
         public int RoleId { get; set; }
-        public UserRole Role { get; set; }
+        //public UserRole Role { get; set; }
 
     }
 
@@ -41,7 +41,7 @@ namespace Domain.User
             builder.Property(p => p.FirstName).HasMaxLength(200);
             builder.Property(p => p.LastName).HasMaxLength(200);
             builder.Property(p => p.PhoneNumber).IsRequired();
-            builder.HasOne(p => p.Role).WithMany(p => p.Users).HasForeignKey(p => p.RoleId);
+            //builder.HasOne(p => p.Role).WithMany(p => p.Users).HasForeignKey(p => p.RoleId);
         }
     }
 }
