@@ -3,11 +3,14 @@ using Domain.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyApp.ViewModels;
 using WebFramework.Api;
+using WebFramework.Filters;
 
 namespace MyApp.Controllers
 {
     [Route("api/[controller]")]
+    [ApiResultFilterAttribute]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -38,9 +41,17 @@ namespace MyApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResult> Create(User user, CancellationToken cancellationToken)
+        public async Task<ApiResult> Create(UserDto userDto, CancellationToken cancellationToken)
         {
-            await _userRepository.AddAsync(user, cancellationToken);
+            var user = new User
+            {
+                UserName = userDto.UserName,
+                Email = userDto.Email,
+                FirstName = userDto.FirstName,
+                LastName = userDto.LastName,
+                PhoneNumber = userDto.PhoneNumber,
+            };
+            await _userRepository.AddAsync(user, userDto.Password, cancellationToken);
 
             return Ok();
         }

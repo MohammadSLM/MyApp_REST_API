@@ -1,4 +1,5 @@
-﻿using Domain.User;
+﻿using Common.Utilities;
+using Domain.User;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,13 @@ namespace DataAccess.Repositories.UserRepositories
             }
 
             return base.Table.Where(a => a.PhoneNumber.Equals(phonenumber, StringComparison.Ordinal)).SingleOrDefaultAsync(cancellationToken);
+        }
+
+        public Task AddAsync(User user,string password, CancellationToken cancellationToken)
+        {
+            var passwordHash = SecurityHelper.GetSha256Hash(password);
+            user.PasswordHash = passwordHash;
+            return base.AddAsync(user, cancellationToken);
         }
     }
 }

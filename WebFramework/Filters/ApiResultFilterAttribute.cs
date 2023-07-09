@@ -61,7 +61,7 @@ namespace WebFramework.Filters
                 context.Result = new JsonResult(apiResult) { StatusCode = contentResult.StatusCode };
             }
             else if (context.Result is ObjectResult objectResult && objectResult.StatusCode == null
-                && !(objectResult.Value is ApiResult))
+                && objectResult.Value is not ApiResult)
             {
                 var apiResult = new ApiResult<object>(true, ApiResultStatusCode.Success, objectResult.Value);
                 context.Result = new JsonResult(apiResult) { StatusCode = objectResult.StatusCode };
