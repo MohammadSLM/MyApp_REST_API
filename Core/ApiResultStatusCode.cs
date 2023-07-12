@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebFramework.Api
+namespace Core
 {
     public enum ApiResultStatusCode
     {
@@ -17,6 +17,12 @@ namespace WebFramework.Api
         NotFound = 3,
 
         [Display(Name = "لیست خالی است.")]
-        ListEmpty = 4
+        ListEmpty = 4,
+
+        [Display(Name = "خطایی در پردازش رخ داد.")]
+        LogicError = 5,
+
+        [Display(Name = "خطای احراز هویت")]
+        UnAuthorized = 6
     }
 }

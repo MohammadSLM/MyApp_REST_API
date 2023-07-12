@@ -1,4 +1,5 @@
 ﻿using Common.Utilities;
+using Core.Exceptions;
 using Domain.User;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -27,11 +28,15 @@ namespace DataAccess.Repositories.UserRepositories
             return base.Table.Where(a => a.PhoneNumber.Equals(phonenumber, StringComparison.Ordinal)).SingleOrDefaultAsync(cancellationToken);
         }
 
-        public Task AddAsync(User user,string password, CancellationToken cancellationToken)
+        public async Task AddAsync(User user, string password, CancellationToken cancellationToken)
         {
+            var exists = await TableNoTracking.AnyAsync(a => a.UserName.Equals(user.UserName));
+            if (exists)
+                throw new BadRequestException("نام کاربری تکراری است.");
+
             var passwordHash = SecurityHelper.GetSha256Hash(password);
             user.PasswordHash = passwordHash;
-            return base.AddAsync(user, cancellationToken);
+            await base.AddAsync(user, cancellationToken);
         }
     }
 }
