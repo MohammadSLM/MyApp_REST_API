@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NLog;
 using NLog.Web;
+using Services.JwtServices;
 using WebFramework.Middlewares;
 
 var logger = LogManager.Setup().LoadConfigurationFromFile("nlog.config").GetCurrentClassLogger();
@@ -29,6 +30,7 @@ try
     });
     builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
     builder.Services.AddScoped<IUserRepository, UserRepository>();
+    builder.Services.AddScoped<IJwtService, JwtService>();
     builder.Services.AddElmah<SqlErrorLog>(options =>
     {
     //must be seperated from main projects db

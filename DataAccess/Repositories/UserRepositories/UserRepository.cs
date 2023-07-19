@@ -18,6 +18,12 @@ namespace DataAccess.Repositories.UserRepositories
 
         }
 
+        public Task<User> GetByUserAndPass(string username, string password, CancellationToken cancellationToken)
+        {
+            var passwordHash = SecurityHelper.GetSha256Hash(password);
+            return Table.Where(p => p.UserName == username && p.PasswordHash == passwordHash).SingleOrDefaultAsync(cancellationToken);
+        }
+
         public Task<User> FindByPhoneNumberAsync(string phonenumber, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(phonenumber))
@@ -25,7 +31,7 @@ namespace DataAccess.Repositories.UserRepositories
                 throw new ArgumentException($"'{nameof(phonenumber)}' نمیتواند خالی باشد.", nameof(phonenumber));
             }
 
-            return base.Table.Where(a => a.PhoneNumber.Equals(phonenumber, StringComparison.Ordinal)).SingleOrDefaultAsync(cancellationToken);
+            return Table.Where(a => a.PhoneNumber.Equals(phonenumber, StringComparison.Ordinal)).SingleOrDefaultAsync(cancellationToken);
         }
 
         public async Task AddAsync(User user, string password, CancellationToken cancellationToken)
@@ -36,7 +42,7 @@ namespace DataAccess.Repositories.UserRepositories
 
             var passwordHash = SecurityHelper.GetSha256Hash(password);
             user.PasswordHash = passwordHash;
-            await base.AddAsync(user, cancellationToken);
+            await AddAsync(user, cancellationToken);
         }
     }
 }

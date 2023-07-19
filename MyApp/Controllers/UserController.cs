@@ -1,9 +1,11 @@
-﻿using DataAccess.Repositories.UserRepositories;
+﻿using Core.Exceptions;
+using DataAccess.Repositories.UserRepositories;
 using Domain.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApp.ViewModels;
+using Services.JwtServices;
 using WebFramework.Api;
 using WebFramework.Filters;
 
@@ -15,9 +17,12 @@ namespace MyApp.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
-        public UserController(IUserRepository userRepository)
+        private readonly IJwtService _jwtService;
+
+        public UserController(IUserRepository userRepository, IJwtService jwtService)
         {
             _userRepository = userRepository;
+            _jwtService = jwtService;
         }
 
         [HttpGet]
@@ -38,6 +43,17 @@ namespace MyApp.Controllers
             if (user is null) return NotFound();
 
             return user;
+        }
+
+        [HttpGet("[action]")]
+        public async Task<String> Token(string userName, string password, CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetByUserAndPass(userName, password, cancellationToken);
+            if (user is null) throw new BadRequestException("نام کاربری یا رمز عبور اشتباه است.");
+
+            var jwt = _jwtService.Generate(user);
+
+            return jwt;
         }
 
         [HttpPost]
