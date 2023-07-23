@@ -1,6 +1,7 @@
 ﻿using Core.Exceptions;
 using DataAccess.Repositories.UserRepositories;
 using Domain.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ namespace MyApp.Controllers
     [Route("api/[controller]")]
     [ApiResultFilterAttribute]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
@@ -46,6 +48,7 @@ namespace MyApp.Controllers
         }
 
         [HttpGet("[action]")]
+        [AllowAnonymous]
         public async Task<String> Token(string userName, string password, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByUserAndPass(userName, password, cancellationToken);

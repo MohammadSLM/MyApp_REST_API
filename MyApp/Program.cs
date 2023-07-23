@@ -1,3 +1,4 @@
+using Core;
 using DataAccess;
 using DataAccess.Repositories;
 using DataAccess.Repositories.UserRepositories;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using NLog;
 using NLog.Web;
 using Services.JwtServices;
+using WebFramework.Configuration;
 using WebFramework.Middlewares;
 
 var logger = LogManager.Setup().LoadConfigurationFromFile("nlog.config").GetCurrentClassLogger();
@@ -16,10 +18,13 @@ logger.Debug("init main");
 
 try
 {
-    var builder = WebApplication.CreateBuilder(args); ;
+    var builder = WebApplication.CreateBuilder(args);
+
+     var _siteSettings = builder.Configuration.GetSection(nameof(SiteSettings)).Get<SiteSettings>();
 
     // Add services to the container.
 
+    builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
     builder.Services.AddControllers();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
@@ -33,9 +38,14 @@ try
     builder.Services.AddScoped<IJwtService, JwtService>();
     builder.Services.AddElmah<SqlErrorLog>(options =>
     {
-    //must be seperated from main projects db
-    options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
+        //must be seperated from main projects db
+        options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
+        //options.OnPermissionCheck = httpContext =>
+        //{
+        //    return httpContext.User.Identity.IsAuthenticated;
+        //};
     });
+    builder.Services.AddJwtAuthentication(_siteSettings.JwtSettings);
 
     // NLog: Setup NLog for Dependency injection
     builder.Logging.ClearProviders();
@@ -56,6 +66,8 @@ try
     app.UseElmah();
 
     app.UseHttpsRedirection();
+
+    app.UseAuthentication();
 
     app.UseAuthorization();
 
