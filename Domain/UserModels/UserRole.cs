@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,8 @@ using System.Threading.Tasks;
 
 namespace Domain.User
 {
-    public class UserRole : BaseEntity
+    public class UserRole : IdentityRole<int> , IEntity
     {
-        public string RoleName { get; set; }
         public string Description { get; set; }
         //public ICollection<User> Users { get; set; }
     }
@@ -19,7 +19,7 @@ namespace Domain.User
     {
         public void Configure(EntityTypeBuilder<UserRole> builder)
         {
-            builder.Property(p => p.RoleName).IsRequired();
+            builder.Property(p => p.Name).IsRequired();
         }
     }
 }

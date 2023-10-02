@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
@@ -9,23 +10,16 @@ using System.Threading.Tasks;
 
 namespace Domain.User
 {
-    public class User : BaseEntity
+    public class User : IdentityUser<int> , IEntity
     {
         public User()
         {
             IsActive = true;
             FullName = FirstName + " " + LastName;
         }
-        [Required]
-        public string UserName { get; set; }
-        [Required]
-        public string PasswordHash { get; set; }
         public string? FullName { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        [Required]
-        public string PhoneNumber { get; set; }
-        public string? Email { get; set; }
         public bool IsActive { get; set; }
         public int RoleId { get; set; }
         //public UserRole Role { get; set; }

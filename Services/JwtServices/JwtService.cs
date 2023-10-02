@@ -1,5 +1,6 @@
 ﻿using Core;
 using Domain.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -15,17 +16,20 @@ namespace Services.JwtServices
     public class JwtService : IJwtService
     {
         private readonly SiteSettings _siteSettings;
-        public JwtService(IOptionsSnapshot<SiteSettings> settings)
+        private readonly SignInManager<User> _signInManager;
+
+        public JwtService(IOptionsSnapshot<SiteSettings> settings, SignInManager<User> signInManager)
         {
             _siteSettings = settings.Value;
+            _signInManager = signInManager;
         }
 
-        public string Generate(User user)
+        public async Task<string> GenerateAsync(User user)
         {
             var secretKey = Encoding.UTF8.GetBytes(_siteSettings.JwtSettings.SecretKey); // must be greater than 256 bytes
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature);
 
-            var claims = _getClaims(user);
+            var claims = await _getClaimsAsync(user);
 
             var descriptor = new SecurityTokenDescriptor
             {
@@ -45,21 +49,24 @@ namespace Services.JwtServices
             return jwt;
         }
 
-        private IEnumerable<Claim> _getClaims(User user)
+        private async Task<IEnumerable<Claim>> _getClaimsAsync(User user)
         {
             //JwtRegisteredClaimNames.Sub
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            };
+            var result = await _signInManager.ClaimsFactory.CreateAsync(user);
+            return result.Claims;
 
-            var roles = new UserRole[] { new UserRole { RoleName = "Admin" } };
-            foreach (var role in roles)
-                claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
+            //var claims = new List<Claim>
+            //{
+            //    new Claim(ClaimTypes.Name, user.UserName),
+            //    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            //};
 
-            return claims;
+            //var roles = new UserRole[] { new UserRole { Name = "Admin" } };
+            //foreach (var role in roles)
+            //    claims.Add(new Claim(ClaimTypes.Role, role.Name));
+
+            //return claims;
         }
     }
 }

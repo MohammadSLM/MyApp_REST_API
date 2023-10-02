@@ -3,6 +3,7 @@ using DataAccess.Repositories.UserRepositories;
 using Domain.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApp.ViewModels;
@@ -20,11 +21,18 @@ namespace MyApp.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtService _jwtService;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<UserRole> _roleManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public UserController(IUserRepository userRepository, IJwtService jwtService)
+        public UserController(IUserRepository userRepository, IJwtService jwtService, UserManager<User> userManager,
+            RoleManager<UserRole> roleManager, SignInManager<User> signInManager)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
@@ -38,9 +46,13 @@ namespace MyApp.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<ApiResult<User>> Get(int id, CancellationToken cancellationToken)
         {
+            var user2 = await _userManager.FindByIdAsync(id.ToString());
             var user = await _userRepository.GetByIdAsync(cancellationToken, id);
+
+            await _userManager.UpdateSecurityStampAsync(user);
 
             if (user is null) return NotFound();
 
@@ -54,7 +66,7 @@ namespace MyApp.Controllers
             var user = await _userRepository.GetByUserAndPass(userName, password, cancellationToken);
             if (user is null) throw new BadRequestException("نام کاربری یا رمز عبور اشتباه است.");
 
-            var jwt = _jwtService.Generate(user);
+            var jwt = await _jwtService.GenerateAsync(user);
 
             return jwt;
         }
@@ -62,6 +74,7 @@ namespace MyApp.Controllers
         [HttpPost]
         public async Task<ApiResult> Create(UserDto userDto, CancellationToken cancellationToken)
         {
+
             var user = new User
             {
                 UserName = userDto.UserName,
@@ -70,6 +83,7 @@ namespace MyApp.Controllers
                 LastName = userDto.LastName,
                 PhoneNumber = userDto.PhoneNumber,
             };
+            var result = await _userManager.CreateAsync(user, userDto.Password);
             await _userRepository.AddAsync(user, userDto.Password, cancellationToken);
 
             return Ok();

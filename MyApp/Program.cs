@@ -33,6 +33,7 @@ try
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
     });
+    builder.Services.AddCustomIdentity(_siteSettings.IdentitySettings);
     builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IJwtService, JwtService>();
