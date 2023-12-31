@@ -35,7 +35,7 @@ namespace MyApp.Controllers
             _signInManager = signInManager;
         }
 
-        [HttpGet]
+        [HttpGet("[action]")]
         public async Task<ApiResult<List<User>>> GetAll(CancellationToken cancellationToken)
         {
             var users = await _userRepository.TableNoTracking.ToListAsync(cancellationToken);
@@ -61,7 +61,7 @@ namespace MyApp.Controllers
 
         [HttpGet("[action]")]
         [AllowAnonymous]
-        public async Task<String> Token(string userName, string password, CancellationToken cancellationToken)
+        public async Task<String> Login(string userName, string password, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByUserAndPass(userName, password, cancellationToken);
             if (user is null) throw new BadRequestException("نام کاربری یا رمز عبور اشتباه است.");
@@ -71,7 +71,7 @@ namespace MyApp.Controllers
             return jwt;
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         [AllowAnonymous]
         public async Task<ApiResult> Create(UserDto userDto, CancellationToken cancellationToken)
         {
@@ -90,7 +90,7 @@ namespace MyApp.Controllers
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("[action]")]
         public async Task<ApiResult> Update(int id, User user, CancellationToken cancellationToken)
         {
             var oldUser = await _userRepository.GetByIdAsync(cancellationToken, id);
@@ -108,7 +108,7 @@ namespace MyApp.Controllers
             return Ok();
         }
 
-        [HttpDelete]
+        [HttpDelete("[action]")]
         public async Task<ApiResult> Delete(int id, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByIdAsync(cancellationToken, id);
