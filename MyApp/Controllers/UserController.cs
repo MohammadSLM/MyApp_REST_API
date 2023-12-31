@@ -72,6 +72,7 @@ namespace MyApp.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ApiResult> Create(UserDto userDto, CancellationToken cancellationToken)
         {
 

@@ -22,4 +22,14 @@ namespace MyApp.ViewModels
                 yield return new ValidationResult("از رمز عبور بهتری استفاده کنید", new[] { nameof(Password) });
         }
     }
+
+    public class UserResultDto
+    {
+        public string UserName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public int RoleId { get; set; }
+    }
 }

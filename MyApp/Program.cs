@@ -6,6 +6,7 @@ using ElmahCore.Mvc;
 using ElmahCore.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using Services.JwtServices;
@@ -28,7 +29,10 @@ try
     builder.Services.AddControllers();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Services.AddSwaggerGen(option =>
+    {
+        option.SwaggerDoc("v1", new OpenApiInfo { Version = "v1", Title = "MyApp"});
+    });
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
@@ -59,7 +63,10 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Doc-v1");
+        });
     }
 
     app.UseCustomExceptionHandler();

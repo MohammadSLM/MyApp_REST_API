@@ -3,6 +3,7 @@ using Common.Utilities;
 using Core;
 using Core.Exceptions;
 using DataAccess.Repositories.UserRepositories;
+using Domain.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,7 +67,7 @@ namespace WebFramework.Configuration
                     },
                     OnTokenValidated = async context =>
                     {
-                        var applicationSignInManager = context.HttpContext.RequestServices.GetRequiredService<IApplicationSignInManager>();
+                        var applicationSignInManager = context.HttpContext.RequestServices.GetRequiredService<SignInManager<User>>();
                         var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
 
                         var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
